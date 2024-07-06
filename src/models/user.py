@@ -4,7 +4,6 @@ from datetime import datetime
 from sqlalchemy import Column, DateTime, String, Boolean
 from sqlalchemy.orm import Mapped
 from src import db
-from src.persistence.repository import Repository as repo
 
 """
 User related functionality
@@ -45,6 +44,19 @@ class User(db.Model):
             "updated_at": self.updated_at.isoformat() if self.updated_at else None,
         }
 
+
+    @staticmethod
+    def get_all() -> list["User"]:
+        """Get all users"""
+
+        return User.query.all()
+    
+    @staticmethod
+    def get(user_id: str) -> "User | None":
+        """Get a user by ID"""
+
+        return User.query.get(user_id)
+    
     @staticmethod
     def create(user: dict) -> "User":
         """Create a new user"""
@@ -56,9 +68,6 @@ class User(db.Model):
                 raise ValueError("User already exists")
 
         new_user = User(**user)
-
-        repo.save(new_user)
-
         return new_user
 
     @staticmethod
@@ -77,32 +86,5 @@ class User(db.Model):
         if "last_name" in data:
             user.last_name = data["last_name"]
 
-        repo.update(user)
-
         return user
 
-
-    @classmethod
-    def get(cls, id: str) -> "User | None":
-        """Get a user by ID"""
-
-        return repo.get(cls.__name__.lower(), id)
-    
-    @classmethod
-    def get_all(cls) -> list["User"]:
-        """Get all users"""
-
-        return repo.get_all(cls.__name__.lower())
-    
-    @classmethod
-    def delete(cls, id: str) -> bool:
-        """Delete a user by ID"""
-
-        user = cls.get(id)
-
-        if not user:
-            return False
-
-        return repo.delete(user)
-    
-    

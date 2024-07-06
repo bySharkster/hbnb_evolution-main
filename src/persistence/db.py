@@ -1,20 +1,13 @@
 from src import db
 from src.models.base import Base
 from src.persistence.repository import Repository
-from utils.constants import USE_DATABASE_ENV_VAR
-
-import os
 
 class DBRepository(Repository):
     """A class representing a database repository."""
 
     def __init__(self) -> None:
-        """
-        Initialize the DBRepository.
-
-        Sets the `use_database` attribute based on the value of the `USE_DATABASE` environment variable.
-        """
-        self.use_database = os.getenv(USE_DATABASE_ENV_VAR, 'False').lower() in ('true', '1', 't')
+       """Initialize the DBRepository class."""
+    pass
 
     def get_all(self, model_name: str) -> list:
         """
@@ -29,15 +22,11 @@ class DBRepository(Repository):
         Raises:
             ValueError: If the specified model name is invalid.
         """
-        if self.use_database:
-            model = self._get_model_by_name(model_name)
-            if model_name:
-                return db.session.query(model).all()
-            else:
-                raise ValueError(f"Invalid model name: {model_name}")
+        model = self._get_model_by_name(model_name)
+        if model_name:
+            return db.session.query(model).all()
         else:
-            # Implement file-based get_all logic
-            pass
+            raise ValueError(f"Invalid model name: {model_name}")
 
     def get(self, model_name: str, obj_id: str) -> Base | None:
         """
@@ -53,30 +42,18 @@ class DBRepository(Repository):
         Raises:
             ValueError: If the specified model name is invalid.
         """
-        if self.use_database:
-            model_name = globals().get(model_name)
-            if model_name:
-                return model_name.query.get(obj_id)
-            else:
-                raise ValueError(f"Invalid model name: {model_name}")
+        model_name = globals().get(model_name)
+        if model_name:
+            return model_name.query.get(obj_id)
         else:
-            # Implement file-based get logic
-            pass
+            raise ValueError(f"Invalid model name: {model_name}")
 
     def reload(self) -> None:
         """
         Reload the database session.
-
         Rolls back any pending changes in the session.
-
-        Note:
-            This method has no effect if `use_database` is False.
         """
-        if self.use_database:
-            db.session.rollback()
-        else:
-            # Implement file-based reload logic
-            pass
+        db.session.rollback()
 
     def save(self, obj: Base) -> None:
         """
@@ -84,17 +61,16 @@ class DBRepository(Repository):
 
         Args:
             obj (Base): The object to be saved.
-
-        Note:
-            This method has no effect if `use_database` is False.
         """
-        if self.use_database:
-            db.session.add(obj)
-            db.session.commit()
-        else:
-            # Implement file-based save logic
-            pass
 
+        cls = obj.__class__.__name__.lower()
+
+        print(f"Saving {obj}, {cls}")
+        db.session.add(obj)
+        db.session.commit()
+
+        return obj
+          
     def update(self, obj: Base) -> Base | None:
         """
         Update an object in the database.
@@ -108,13 +84,9 @@ class DBRepository(Repository):
         Note:
             This method has no effect if `use_database` is False.
         """
-        if self.use_database:
-            db.session.commit()
-            return obj
-        else:
-            # Implement file-based update logic
-            pass
-
+        db.session.commit()
+        return obj
+        
     def delete(self, obj: Base) -> bool:
         """
         Delete an object from the database.
@@ -128,10 +100,7 @@ class DBRepository(Repository):
         Note:
             This method has no effect if `use_database` is False.
         """
-        if self.use_database:
-            db.session.delete(obj)
-            db.session.commit()
-            return True
-        else:
-            # Implement file-based delete logic
-            pass
+        db.session.delete(obj)
+        db.session.commit()
+        return True
+        
