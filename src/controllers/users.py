@@ -4,7 +4,9 @@ Users controller module
 
 from flask import abort, request
 from src.models.user import User
+from src.persistence.db import DBRepository
 
+data_manager = DBRepository()
 
 def get_users():
     """Returns all users"""
@@ -19,6 +21,8 @@ def create_user():
 
     try:
         user = User.create(data)
+        data_manager.save(user)
+        
     except KeyError as e:
         abort(400, f"Missing field: {e}")
     except ValueError as e:

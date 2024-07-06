@@ -11,6 +11,7 @@ from src.controllers.users import (
     update_user,
 )
 
+
 users_bp = Blueprint("users", __name__, url_prefix="/users")
 
 users_bp.route("/", methods=["GET"])(get_users)

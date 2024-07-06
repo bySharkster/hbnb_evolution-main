@@ -2,7 +2,6 @@
 to be used based on the environment variable REPOSITORY_ENV_VAR."""
 
 import os
-
 from src.persistence.repository import Repository
 from utils.constants import REPOSITORY_ENV_VAR
 

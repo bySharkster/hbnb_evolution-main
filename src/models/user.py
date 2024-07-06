@@ -1,19 +1,30 @@
+from enum import auto
+import uuid
+from datetime import datetime
+from sqlalchemy import Column, DateTime, String, Boolean
+from sqlalchemy.orm import Mapped
+from src import db
+from src.persistence.repository import Repository as repo
+
 """
 User related functionality
 """
 
-from src.models.base import Base
+class User(db.Model):
+    
+    __tablename__ = "users"
 
-
-class User(Base):
-    """User representation"""
-
-    email: str
-    first_name: str
-    last_name: str
+    id: Mapped[str] = Column(String(36), primary_key=True, nullable=False, unique=True, autoincrement=False, default=str(uuid.uuid4()))
+    email: Mapped[str] = Column(String(120), unique=True, nullable=False)
+    password: Mapped[str] = Column(String(128), nullable=False)
+    first_name: Mapped[str] = Column(String(60), nullable=False)
+    last_name: Mapped[str] = Column(String(60), nullable=False)
+    is_admin: Mapped[bool] = Column(Boolean, default=False)
+    created_at: Mapped[datetime] = Column(DateTime, default=datetime.now, nullable=False)
+    updated_at: Mapped[datetime] = Column(DateTime, onupdate=datetime.now, nullable=False)
 
     def __init__(self, email: str, first_name: str, last_name: str, **kw):
-        """Dummy init"""
+        """Initialize a User object"""
         super().__init__(**kw)
         self.email = email
         self.first_name = first_name
@@ -30,14 +41,13 @@ class User(Base):
             "email": self.email,
             "first_name": self.first_name,
             "last_name": self.last_name,
-            "created_at": self.created_at.isoformat(),
-            "updated_at": self.updated_at.isoformat(),
+            "created_at": self.created_at.isoformat() if self.created_at else None,
+            "updated_at": self.updated_at.isoformat() if self.updated_at else None,
         }
 
     @staticmethod
     def create(user: dict) -> "User":
         """Create a new user"""
-        from src.persistence import repo
 
         users: list["User"] = User.get_all()
 
@@ -54,7 +64,6 @@ class User(Base):
     @staticmethod
     def update(user_id: str, data: dict) -> "User | None":
         """Update an existing user"""
-        from src.persistence import repo
 
         user: User | None = User.get(user_id)
 
@@ -71,3 +80,29 @@ class User(Base):
         repo.update(user)
 
         return user
+
+
+    @classmethod
+    def get(cls, id: str) -> "User | None":
+        """Get a user by ID"""
+
+        return repo.get(cls.__name__.lower(), id)
+    
+    @classmethod
+    def get_all(cls) -> list["User"]:
+        """Get all users"""
+
+        return repo.get_all(cls.__name__.lower())
+    
+    @classmethod
+    def delete(cls, id: str) -> bool:
+        """Delete a user by ID"""
+
+        user = cls.get(id)
+
+        if not user:
+            return False
+
+        return repo.delete(user)
+    
+    

@@ -10,6 +10,10 @@ This module exports configuration classes for the Flask application.
 from abc import ABC
 import os
 
+from flask_sqlalchemy import SQLAlchemy
+
+from utils.constants import USE_DATABASE_ENV_VAR
+
 
 class Config(ABC):
     """
@@ -19,7 +23,6 @@ class Config(ABC):
 
     DEBUG = False
     TESTING = False
-
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 
@@ -41,6 +44,8 @@ class DevelopmentConfig(Config):
 
     SQLALCHEMY_DATABASE_URI = os.getenv(
         "DATABASE_URL", "sqlite:///hbnb_dev.db")
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+    USE_DATABASE = os.getenv(USE_DATABASE_ENV_VAR, 'False').lower() in ('true', '1', 't')
     DEBUG = True
 
 

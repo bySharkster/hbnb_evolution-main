@@ -13,8 +13,6 @@ class MemoryRepository(Repository):
     """
     A Repository that does not persist data, it only stores it in memory
 
-
-
     Every time the server is restarted, the data is lost
     """
 
@@ -52,7 +50,7 @@ class MemoryRepository(Repository):
         cls = obj.__class__.__name__.lower()
 
         if obj not in self.__data[cls]:
-            # print(f"Saving {obj}, {cls}")
+            print(f"Saving {obj}, {cls}")
             self.__data[cls].append(obj)
 
         return obj

@@ -1,9 +1,12 @@
 """ Initialize the Flask app. """
-
 from flask import Flask
 from flask_cors import CORS
+from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
 
 cors = CORS()
+db = SQLAlchemy()
+migrate = Migrate()
 
 
 def create_app(config_class="src.config.DevelopmentConfig") -> Flask:
@@ -15,6 +18,9 @@ def create_app(config_class="src.config.DevelopmentConfig") -> Flask:
     app.url_map.strict_slashes = False
 
     app.config.from_object(config_class)
+
+    db.init_app(app)
+    migrate.init_app(app, db)
 
     register_extensions(app)
     register_routes(app)
