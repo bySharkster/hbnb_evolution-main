@@ -2,25 +2,28 @@
 Place related functionality
 """
 
+from tokenize import String
 from src.models.base import Base
 from src.models.city import City
 from src.models.user import User
-
+from sqlalchemy import Column, String
+from sqlalchemy.orm import Mapped
 
 class Place(Base):
     """Place representation"""
-
-    name: str
-    description: str
-    address: str
-    latitude: float
-    longitude: float
-    host_id: str
-    city_id: str
-    price_per_night: int
-    number_of_rooms: int
-    number_of_bathrooms: int
-    max_guests: int
+    __tablename__ = "places"
+    
+    name: Mapped[str] = Column(String(128), nullable=False)
+    description: Mapped[str] = Column(String, nullable=False)
+    address: Mapped[str] = Column(String(256), nullable=False)
+    latitude: Mapped[float] = Column(Float, nullable=False)
+    longitude: Mapped[float] = Column(Float, nullable=False)
+    host_id: Mapped[str] = Column(String(36), db.ForeignKey("users.id"), unique=True, nullable=False)
+    city_id: Mapped[str] = Column(String(36), db.ForeignKey("cities.id"), unique=True, nullable=False)
+    price_per_night: Mapped[int] = Column(Integer, nullable=False)
+    number_of_bathrooms: Mapped[int] = Column(Integer, nullable=False)
+    number_of_rooms: Mapped[int] = Column(Integer, nullable=False)
+    max_guests: Mapped[int] = Column(Integer, nullable=False)
 
     def __init__(self, data: dict | None = None, **kw) -> None:
         """Dummy init"""

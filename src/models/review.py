@@ -2,18 +2,22 @@
 Review related functionality
 """
 
+from sqlalchemy import Column
 from src.models.base import Base
 from src.models.place import Place
 from src.models.user import User
-
+from sqlalchemy import Column, String
+from sqlalchemy.orm import Mapped
+from src import db
 
 class Review(Base):
     """Review representation"""
-
-    place_id: str
-    user_id: str
-    comment: str
-    rating: float
+    __tablename__ = "reviews"
+    
+    place_id = Mapped[str] = Column(String(36), db.ForeignKey('places.id'), nullable=False)
+    user_id = Mapped[str] = Column(String(36), db.ForeignKey('users.id'), nullable=False)
+    comment = Mapped[str] = Column(String, nullable=False)
+    rating = Mapped[float] = Column(Float, nullable=False)
 
     def __init__(
         self, place_id: str, user_id: str, comment: str, rating: float, **kw

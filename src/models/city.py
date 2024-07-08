@@ -4,13 +4,15 @@ City related functionality
 
 from src.models.base import Base
 from src.models.country import Country
-
+from sqlalchemy import Column, String
+from sqlalchemy.orm import Mapped
 
 class City(Base):
     """City representation"""
-
-    name: str
-    country_code: str
+    __tablename__ = "cities"
+     
+    name: Mapped[str] = Column(String(128), nullable=False)
+    country_code: Mapped[str] = Column(String(3), ForeignKey("countries.code"), nullable=False)
 
     def __init__(self, name: str, country_code: str, **kw) -> None:
         """Dummy init"""

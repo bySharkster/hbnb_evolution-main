@@ -3,6 +3,10 @@ Country related functionality
 """
 
 
+from sqlalchemy import Column
+from sqlalchemy import Column, String
+from sqlalchemy.orm import Mapped
+
 class Country:
     """
     Country representation
@@ -11,9 +15,10 @@ class Country:
 
     This class is used to get and list countries
     """
-
-    name: str
-    code: str
+    __tablename__ = "countries"
+    
+    name: Mapped[str] = Column(String(36), unique=True, nullable=False)
+    code: Mapped[str] = Column(String(3), unique=True, primary_key=True, nullable=False)
     cities: list
 
     def __init__(self, name: str, code: str, **kw) -> None:
